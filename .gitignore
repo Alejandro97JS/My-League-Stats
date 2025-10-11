@@ -205,3 +205,12 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Environment
+environment_my_league_stats/
+
+# Folder with dataset
+dataset/
+
+# Folder with generated files
+generated_files/
