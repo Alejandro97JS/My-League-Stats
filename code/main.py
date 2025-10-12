@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from data_reader import DataReader
 from stats_calculator import PointsStatsCalculator
 from graficator import Graficator
+from pdf_converter import PDFPresentation
 
 if __name__ == "__main__":
     # Cargar variables de entorno desde .env
@@ -25,27 +26,15 @@ if __name__ == "__main__":
 
     # Display the best and worst rounds overall:
     text_rounds_list = []
-    best_overall, worst_overall = calculator.get_best_worst_round()
-    text_round_overall = "Mejor / Peor Jornada Global:\n"
-    text_round_overall += f"\nMejor jornada: {best_overall.get('player')}\n"
-    text_round_overall += f"Fue en la jornada: {best_overall.get('round_number')}\n"
-    text_round_overall += f"Puntos conseguidos: {best_overall.get('points')}\n"
-    text_round_overall += f"\nPeor jornada: {worst_overall.get('player')}\n"
-    text_round_overall += f"Fue en la jornada: {worst_overall.get('round_number')}\n"
-    text_round_overall += f"Puntos conseguidos: {worst_overall.get('points')}\n"
-    print(text_round_overall)
-    text_rounds_list.append(text_round_overall)
+    text_rounds_list.append(
+        calculator.get_verbose_best_worst_round(is_overall=True)
+    )
 
     # Display the best and worst rounds for each player:
     for player in df.columns[1:]:  # Skip the first column which is 'Jornada'
-        best, worst = calculator.get_best_worst_round(player)
-        text_round_player = f"Mejor / Peor Jornada de {player}:\n"
-        text_round_player += f"\nFue en la jornada: {best.get('round_number')}\n"
-        text_round_player += f"Puntos conseguidos: {best.get('points')}\n"
-        text_round_player += f"\nFue en la jornada: {worst.get('round_number')}\n"
-        text_round_player += f"Puntos conseguidos: {worst.get('points')}\n"
-        print(text_round_player)
-        text_rounds_list.append(text_round_player)
+        text_rounds_list.append(
+            calculator.get_verbose_best_worst_round(player)
+        )
 
     # Graphics:
     graficator = Graficator()
@@ -60,3 +49,24 @@ if __name__ == "__main__":
     points_image_path = graficator.plot_lines(df_points, value_column="aggregated_points", 
                           round_numbers_to_exclude=[6])
     generated_file_paths.append(points_image_path)
+
+    # Create PDF presentation:
+    pdf_report_file = PDFPresentation(
+        filename=os.path.join(base_dir,
+            "generated_files",
+            "league_report.pdf"
+            )
+    )
+    pdf_report_file.add_text_slide(
+        text="Informe de la Liga",
+    )
+    for image_file_path in generated_file_paths:
+        pdf_report_file.add_image_slide(
+            image_path=image_file_path
+        )
+    for text_round in text_rounds_list:
+        pdf_report_file.add_text_slide(
+            text=text_round
+        )
+    pdf_report_file.save()
+    print(f"PDF report generated at: {pdf_report_file.filename}")

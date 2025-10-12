@@ -133,6 +133,28 @@ class PointsStatsCalculator:
         if player is not None and (best["player"] is None or worst["player"] is None):
             return None, None
         return best, worst
+    
+    def get_verbose_best_worst_round(self, player = None, 
+            best = None, worst = None, is_overall = False):
+        if best is None or worst is None:
+            best, worst = self.get_best_worst_round(player)
+        if best is None or worst is None:
+            return "No data available for the specified player."
+        if is_overall:
+            text = "Mejor / Peor Jornada Global:\n"
+            text += f"\nMejor jornada: {best.get('player')}\n"
+        else:
+            text = f"Mejor jornada de {best.get('player')}:\n"
+        text += f"Fue en la jornada: {best.get('round_number')}\n"
+        text += f"Puntos conseguidos: {best.get('points')}\n"
+        text += "\n----------\n"
+        if is_overall:
+            text += f"Peor jornada: {worst.get('player')}\n"
+        else:
+            text += f"Peor jornada de {worst.get('player')}:\n"
+        text += f"Fue en la jornada: {worst.get('round_number')}\n"
+        text += f"Puntos conseguidos: {worst.get('points')}\n"
+        return text
 
     def get_data_dict(self):
         return self.data_dict
