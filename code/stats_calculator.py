@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import json
 
@@ -68,7 +69,16 @@ class PointsStatsCalculator:
                 "data": round_data
             })
         # Save the result as a JSON file
-        with open("points_stats.json", "w", encoding="utf-8") as f: # TODO: Env variables
+        json_folder_path = os.path.join(
+            os.getenv('BASE_DIR'),
+            'generated_files'
+        )
+        json_file_path = os.path.join(
+            json_folder_path,
+            'points_stats.json'
+        )
+        os.makedirs(json_folder_path, exist_ok=True)
+        with open(json_file_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=4)
         result = sorted(result, key=lambda x: x["round"])
         return result
@@ -123,3 +133,6 @@ class PointsStatsCalculator:
         if player is not None and (best["player"] is None or worst["player"] is None):
             return None, None
         return best, worst
+
+    def get_data_dict(self):
+        return self.data_dict

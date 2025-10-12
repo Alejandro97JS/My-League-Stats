@@ -54,10 +54,13 @@ class Graficator:
             plt.gca().invert_yaxis()
 
         # Create the directory if it doesn't exist
-        output_dir = '' # TODO: Env variables
+        output_dir = os.path.join(
+            os.getenv('BASE_DIR'),
+            'generated_files'
+        )
         os.makedirs(output_dir, exist_ok=True)
         # Use the visual name also in the generated file
-        file_value = visual_names.get(value_column, value_column)
-        output_path = os.path.join(output_dir, f'{file_value}_por_Jornada_y_Equipo.png')
+        output_path = os.path.join(output_dir, f'{value_column}_per_round_and_team.png')
         plt.savefig(output_path, bbox_inches='tight')
         plt.close()
+        return output_path
