@@ -4,6 +4,7 @@ from data_reader import DataReader
 from stats_calculator import PointsStatsCalculator
 from graficator import Graficator
 from pdf_converter import PDFPresentation
+from ai_data_assistant import OpenAIDataAssistant
 
 if __name__ == "__main__":
     # Cargar variables de entorno desde .env
@@ -50,6 +51,32 @@ if __name__ == "__main__":
                           round_numbers_to_exclude=[6])
     generated_file_paths.append(points_image_path)
 
+    ai_questions_list = [
+        {
+            "readable_question": "Lo más destacado",
+            "ai_question": "¿Qué es lo más destacado de los datos hasta ahora?"
+        },
+        {
+            "readable_question": "Una curiosidad",
+            "ai_question": "¿Qué curiosidad o dato curioso y rebuscado ves en los datos?"
+        },
+        {
+            "readable_question": "Tendencias",
+            "ai_question": "¿Quién tiene una mejor y peor tendencia fijándose solamente en las últimas jornadas?"
+        },
+        {
+            "readable_question": "Una predicción",
+            "ai_question": "¿Qué predicción harías sobre las siguientes jornadas? Responde lo más destacado en tres o cuatro frases."
+        }
+    ]
+    ai_answers_list = []
+    open_ai_api_token = os.getenv('OPEN_AI_API_TOKEN')
+    if open_ai_api_token:
+        ai_data_assistant = OpenAIDataAssistant(api_token=open_ai_api_token)
+        for question in ai_questions_list:
+            answer = ai_data_assistant.ask_insight(f"{question.get('ai_question')}: {calculator.get_data_dict()}")
+            ai_answers_list.append(f'{question.get("readable_question")}\nIA: "{answer}"')
+
     # Create PDF presentation:
     pdf_report_file = PDFPresentation(
         filename=os.path.join(base_dir,
@@ -67,6 +94,10 @@ if __name__ == "__main__":
     for text_round in text_rounds_list:
         pdf_report_file.add_text_slide(
             text=text_round
+        )
+    for ai_answer in ai_answers_list:
+        pdf_report_file.add_text_slide(
+            text=ai_answer
         )
     pdf_report_file.save()
     print(f"PDF report generated at: {pdf_report_file.filename}")
