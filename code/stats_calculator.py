@@ -158,3 +158,17 @@ class PointsStatsCalculator:
 
     def get_data_dict(self):
         return self.data_dict
+
+    def get_market_movements_dict(self, market_df):
+        """
+        Given a DataFrame structured as needed with market data,
+        returns a dictionary mapping team names to their total market movements.
+        """
+        # Skip the first column (Mes), sum the rest per column
+        team_columns = market_df.columns[1:]
+        movements = {}
+        for team in team_columns:
+            # Convert to numeric in case of string values
+            total = pd.to_numeric(market_df[team], errors='coerce').sum()
+            movements[team] = int(total)
+        return movements

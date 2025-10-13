@@ -64,3 +64,55 @@ class Graficator:
         plt.savefig(output_path, bbox_inches='tight')
         plt.close()
         return output_path
+
+    def plot_market_moves_bar(self, moves_dict: dict) -> str:
+        """
+        Generates a bar plot where the x-axis represents teams and the y-axis is the number of market moves.
+        The plot is saved as an image in the 'generated_files' folder.
+
+        Args:
+            moves_dict (dict): Dictionary with team names as keys and number of moves as values.
+
+        Returns:
+            str: Path to the saved plot image.
+        """
+        import matplotlib.cm as cm
+
+        # Sort moves_dict by number of moves in descending order
+        sorted_items = sorted(moves_dict.items(), key=lambda x: x[1], reverse=True)
+        teams = [item[0] for item in sorted_items]
+        moves = [item[1] for item in sorted_items]
+
+        # Normalize moves for colormap (higher moves = darker blue, lower = normal blue)
+        norm = plt.Normalize(vmin=min(moves), vmax=max(moves))
+        cmap = cm.get_cmap('Blues')
+
+        # Invert the normalized values so that higher moves are darker blue
+        colors = [cmap(norm(val)) for val in moves]
+
+        # To ensure higher moves are darker, reverse the colormap
+        colors = [cmap(0.4 + 0.6 * (val - min(moves)) / (max(moves) - min(moves) if max(moves) != min(moves) else 1)) for val in moves]
+
+        plt.figure(figsize=(12, 6))
+        bars = plt.bar(teams, moves, color=colors)
+        plt.xlabel('Equipo')
+        plt.ylabel('Compras/Ventas')
+        plt.title('Movimientos de Mercado por Equipo')
+        plt.xticks(rotation=30, ha='right')
+
+        # Annotate bars with values
+        for bar, value in zip(bars, moves):
+            plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), str(value),
+                     ha='center', va='bottom', fontsize=10)
+
+        plt.tight_layout()
+
+        output_dir = os.path.join(
+            os.getenv('BASE_DIR'),
+            'generated_files'
+        )
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, 'market_moves_per_team.png')
+        plt.savefig(output_path, bbox_inches='tight')
+        plt.close()
+        return output_path

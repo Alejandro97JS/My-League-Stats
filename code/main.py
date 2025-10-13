@@ -1,6 +1,6 @@
 import os
+import pandas as pd
 from dotenv import load_dotenv
-from data_reader import DataReader
 from stats_calculator import PointsStatsCalculator
 from graficator import Graficator
 from pdf_converter import PDFPresentation
@@ -18,9 +18,8 @@ if __name__ == "__main__":
         "dataset",
         "points.csv"
     )
-    # Read the data using DataReader
-    reader = DataReader()
-    df = reader.read_points_data(csv_points_path)
+    # Read points data using DataReader
+    df = pd.read_csv(csv_points_path, delimiter=';', encoding='utf-8')
 
     # Instantiate the PointsStatsCalculator
     calculator = PointsStatsCalculator(df)
@@ -51,30 +50,55 @@ if __name__ == "__main__":
                           round_numbers_to_exclude=[6])
     generated_file_paths.append(points_image_path)
 
+    # Market data:
+    if os.getenv('INCLUDE_MARKET_DATA'):
+        # Path to the CSV market data file
+        csv_market_path = os.path.join(
+            base_dir,
+            "dataset",
+            "market.csv"
+        )
+        # Read the data:
+        df_market = pd.read_csv(csv_market_path, delimiter=';', encoding='utf-8')
+        market_data_dict = calculator.get_market_movements_dict(df_market)
+
+    # AI Questions:
     ai_questions_list = [
         {
             "readable_question": "Lo más destacado",
-            "ai_question": "¿Qué es lo más destacado de los datos hasta ahora?"
+            "ai_question": "¿Qué es lo más destacado de los datos hasta ahora?",
+            "data": calculator.get_data_dict()
         },
         {
             "readable_question": "Una curiosidad",
-            "ai_question": "¿Qué curiosidad o dato curioso y rebuscado ves en los datos?"
+            "ai_question": "¿Qué curiosidad o dato curioso y rebuscado ves en los datos?",
+            "data": calculator.get_data_dict()
         },
         {
             "readable_question": "Tendencias",
-            "ai_question": "¿Quién tiene una mejor y peor tendencia fijándose solamente en las últimas jornadas?"
+            "ai_question": "¿Quién tiene una mejor y peor tendencia fijándose solamente en las últimas jornadas?",
+            "data": calculator.get_data_dict()
         },
         {
             "readable_question": "Una predicción",
-            "ai_question": "¿Qué predicción harías sobre las siguientes jornadas? Responde lo más destacado en tres o cuatro frases."
+            "ai_question": "¿Qué predicción harías sobre las siguientes jornadas? Responde lo más destacado en tres o cuatro frases.",
+            "data": calculator.get_data_dict()
         }
     ]
+    if os.getenv('INCLUDE_MARKET_DATA'):
+        ai_questions_list.append(
+            {
+                "readable_question": "El mercado",
+                "ai_question": "Dime un dato curioso y relevante sobre el número de operaciones en el mercado de fichajes por cada equipo: ",
+                "data": market_data_dict
+            }
+        )
     ai_answers_list = []
     open_ai_api_token = os.getenv('OPEN_AI_API_TOKEN')
     if open_ai_api_token:
         ai_data_assistant = OpenAIDataAssistant(api_token=open_ai_api_token)
         for question in ai_questions_list:
-            answer = ai_data_assistant.ask_insight(f"{question.get('ai_question')}: {calculator.get_data_dict()}")
+            answer = ai_data_assistant.ask_insight(f"{question.get('ai_question')}: {question.get('data')}")
             ai_answers_list.append(f'{question.get("readable_question")}\nIA: "{answer}"')
 
     # Create PDF presentation:
@@ -94,6 +118,10 @@ if __name__ == "__main__":
     for text_round in text_rounds_list:
         pdf_report_file.add_text_slide(
             text=text_round
+        )
+    if os.getenv('INCLUDE_MARKET_DATA'):
+        pdf_report_file.add_image_slide(
+            image_path=graficator.plot_market_moves_bar(market_data_dict)
         )
     for ai_answer in ai_answers_list:
         pdf_report_file.add_text_slide(
