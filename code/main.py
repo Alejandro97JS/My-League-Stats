@@ -12,6 +12,8 @@ if __name__ == "__main__":
     # BASE_DIR env variable should point to the 
     # project root directory:
     base_dir = os.getenv("BASE_DIR")
+    # Check if we have to include market data:
+    include_market_data = str(os.getenv('INCLUDE_MARKET_DATA')).lower() == "true"
     # Path to the CSV points per round file
     csv_points_path = os.path.join(
         base_dir,
@@ -51,7 +53,7 @@ if __name__ == "__main__":
     generated_file_paths.append(points_image_path)
 
     # Market data:
-    if os.getenv('INCLUDE_MARKET_DATA'):
+    if include_market_data:
         # Path to the CSV market data file
         csv_market_path = os.path.join(
             base_dir,
@@ -85,7 +87,7 @@ if __name__ == "__main__":
             "data": calculator.get_data_dict()
         }
     ]
-    if os.getenv('INCLUDE_MARKET_DATA'):
+    if include_market_data:
         ai_questions_list.append(
             {
                 "readable_question": "El mercado",
@@ -119,7 +121,7 @@ if __name__ == "__main__":
         pdf_report_file.add_text_slide(
             text=text_round
         )
-    if os.getenv('INCLUDE_MARKET_DATA'):
+    if include_market_data:
         pdf_report_file.add_image_slide(
             image_path=graficator.plot_market_moves_bar(market_data_dict)
         )
