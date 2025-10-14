@@ -36,8 +36,22 @@ BASE_DIR=your_api_key_here
 Additionally, you can set up `OPEN_AI_API_TOKEN` env var with your api key to the OpenAI API, in order to ask AI models for interesting insights in the data. You can also set up `INCLUDE_MARKET_DATA` as `True`, and the script will look for the `.csv` file with market data and will analyze it.
 
 4. You have to create a `/dataset` folder in the project's root directory and, inside it, you have to put your `points.csv` file, with the following structure:
+```csv
+Jornada;Team Thunder;The Stars;Just My Team;Another Team;Team Example
+J1;56;39;7;56;69
+J2;64;38;40;43;60
+J6;29;45;21;34;52
+J3;46;54;36;25;51
+```
 
 If you are asking for market data analysis (`INCLUDE_MARKET_DATA` env var), you also need to have in that directory a `market.csv` file with the following structure:
+```csv
+Mes;Team Thunder;The Stars;Just My Team;Another Team;Team Example
+Julio 2025;1;0;1;0;0
+Agosto 2025;58;22;14;22;32
+Septiembre 2025;46;3;13;18;17
+Octubre 2025;16;6;2;1;5
+```
 
 Some fantasy leagues apps allow to download these csv files directly with the needed structure.
 
@@ -77,4 +91,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](#file:LICENSE) file for details.
