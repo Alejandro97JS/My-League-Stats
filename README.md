@@ -1,4 +1,5 @@
 # My-League-Stats
+
 ## 🏆 Fantasy League Football Statistics
 
 A fantasy football league statistics analyzer that provides detailed insights about each team performance, generating a PDF report (in Spanish) with interesting data and graphics for your fantasy league with your friends.
@@ -19,23 +20,28 @@ My-League-Stats is a Python-based application that uses fantasy football leagues
 ## 🚀 Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/alejandro97js/My-League-Stats.git
 cd My-League-Stats
 ```
 
 2. Install required dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 3. The only mandatory env var in your `.env` file (you have to create it!) is `BASE_DIR`, the absolute path to the project's root directory:
+
 ```env
 BASE_DIR=your_api_key_here
 ```
+
 Additionally, you can set up `OPEN_AI_API_TOKEN` env var with your api key to the OpenAI API, in order to ask AI models for interesting insights in the data. You can also set up `INCLUDE_MARKET_DATA` as `True`, and the script will look for the `.csv` file with market data and will analyze it.
 
 4. You have to create a `/dataset` folder in the project's root directory and, inside it, you have to put your `points.csv` file, with the following structure:
+
 ```csv
 Jornada;Team Thunder;The Stars;Just My Team;Another Team;Team Example
 J1;56;39;7;56;69
@@ -45,6 +51,7 @@ J3;46;54;36;25;51
 ```
 
 If you are asking for market data analysis (`INCLUDE_MARKET_DATA` env var), you also need to have in that directory a `market.csv` file with the following structure:
+
 ```csv
 Mes;Team Thunder;The Stars;Just My Team;Another Team;Team Example
 Julio 2025;1;0;1;0;0
@@ -78,6 +85,16 @@ My-League-Stats/
 └── generated_files/     # Directory where results will be created (the folder
                          # will be created if it does not exist, too)
 ```
+
+## 📑 Examples from PDF
+
+Below are sample images included in the generated report:
+
+- Position per round and team![Position per round and team](./doc/images/position_per_round_and_team.png)
+- Aggregated points per round and team![Aggregated points per round and team](./doc/images/aggregated_points_per_round_and_team.png)
+- Best and worst round![Best and worst round](./doc/images/best_and_worst_round.png)
+- Market moves per team
+  ![Market moves per team](./doc/images/market_moves_per_team.png)
 
 ## 🤝 Contributing
 
